@@ -31,13 +31,13 @@ class Belt extends Entity{
         if(this.isReadyToAcceptItem()){
             var prevbelt = this.getPrevBelt()
             if(prevbelt?.isReadyToGiveItem()){
-                this.acceptItem(prevbelt.takeReadyItem()) 
+                this.acceptItem(prevbelt.giveItem()) 
             }
 
             var sidebelts = this.getSideLoadingBelts()
             for(var sidebelt of sidebelts){
                 if(sidebelt.isReadyToGiveItem()){
-                    this.acceptItem(sidebelt.takeReadyItem())
+                    this.acceptItem(sidebelt.giveItem())
                     break;
                 }
             }
@@ -87,7 +87,7 @@ class Belt extends Entity{
         return true
     }
 
-    takeReadyItem():Item{
+    giveItem():Item{
         this.itemqueue.splice(this.itemqueue.length - 1,1)
         var item = this.readyForDelivery
         this.readyForDelivery = null
@@ -140,30 +140,6 @@ class Belt extends Entity{
             drawRect(abspos,gridsize)
         }
     }
-}
-
-function drawRect(pos,size){
-    ctxt.fillRect(pos.x,pos.y, size.x, size.y)
-}
-
-function drawRectCentered(pos,size){
-    var halfsize = size.c().scale(0.5)
-    ctxt.strokeRect(pos.x-halfsize.x,pos.y - halfsize.y, size.x, size.y)
-}
-
-function moveTowards(current,target,maxdelta){
-    var to = target - current
-    var dist = Math.abs(to)
-
-    if(dist <= maxdelta){
-        return target
-    }
-
-    return current + Math.sign(to) * maxdelta
-}
-
-function world2abs(pos){
-    return pos.c().mul(gridsize)
 }
 
 class itemMoveCompletion{

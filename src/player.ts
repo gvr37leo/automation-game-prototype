@@ -18,6 +18,7 @@ class Player extends Entity{
         var abspos = this.pos.c().mul(gridsize)
         abspos.add(halfgridsize)
         drawRectCentered(abspos,new Vector(40,80))
+        
     }
 
 }

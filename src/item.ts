@@ -1,6 +1,8 @@
 class Item extends Entity{
 
     name:string
+    stackSize:number
+    maxStackSize:number
 
     constructor(data){
         super()

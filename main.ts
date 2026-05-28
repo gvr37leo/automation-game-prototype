@@ -12,10 +12,16 @@
 /// <reference path="libs/utils/camera.ts" />
 /// <reference path="libs/utils/domutils.js" />
 /// <reference path="src/entity.ts" />
-/// <reference path="src/assembler.ts" />
+/// <reference path="src/machine.ts" />
 /// <reference path="src/belt.ts" />
 /// <reference path="src/item.ts" />
 /// <reference path="src/player.ts" />
+/// <reference path="src/inserter.ts" />
+/// <reference path="src/recipe.ts" />
+/// <reference path="src/utils.ts" />
+/// <reference path="src/inventory.ts" />
+
+
 
 
 
