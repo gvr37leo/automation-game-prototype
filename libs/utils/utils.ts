@@ -27,8 +27,8 @@ function max(a: number, b: number): number{
     return b;
 }
 
-function clamp(val: number, min: number, max: number): number{
-    return this.max(this.min(val, max), min)
+function clamp(val: number, minv: number, maxv: number): number{
+    return max(min(val, maxv), minv)
 }
 
 function rangeContain(a1: number, a2: number, b1: number, b2: number):boolean{//as in does a enclose b----- so returns true if b is smaller in all ways

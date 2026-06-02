@@ -16,7 +16,6 @@ class Belt extends Entity{
     direction: Direction
     itemqueue:itemMoveCompletion[] = []
     movespeed = 2
-    readyForDelivery:Item
     blocked
 
     constructor(data){
@@ -43,8 +42,7 @@ class Belt extends Entity{
             }
         }
         
-        //check connecting belts to see if they have an item readyfordelivery
-        //move items from right to left
+        //update items from right to left
         var maxcompletion = 1
         for(var i = this.itemqueue.length - 1; i >= 0; i--){
             var item = this.itemqueue[i]
@@ -56,14 +54,23 @@ class Belt extends Entity{
             item.completion = moveTowards(item.completion, maxcompletion, dt*this.movespeed)
             maxcompletion -= 0.25
             item.item.pos = this.pos.lerp(this.pos.c().add(convertDirection(this.direction)),item.completion)
-            if(item.completion == 1){
-                this.readyForDelivery = item.item
-            }
         }
     }
 
     isReadyToGiveItem(){
-        return this.readyForDelivery != null
+        return last(this.itemqueue)?.completion == 1
+    }
+    
+    giveItem():Item{
+        var item = last(this.itemqueue)?.item
+        this.itemqueue.splice(this.itemqueue.length - 1,1)
+        return item
+    }
+
+    giveItemFirst():Item{
+        var item = this.itemqueue[0]?.item
+        this.itemqueue.splice(0,1)
+        return item
     }
 
     isReadyToAcceptItem():boolean{
@@ -87,18 +94,20 @@ class Belt extends Entity{
         return true
     }
 
-    giveItem():Item{
-        this.itemqueue.splice(this.itemqueue.length - 1,1)
-        var item = this.readyForDelivery
-        this.readyForDelivery = null
-        return item
-    }
 
     getPrevBelt():Belt{
         
 
-        var prevpos = this.pos.c().add(convertDirection(this.direction).c().scale(-1)) 
-        return beltgrid[`${prevpos.x}:${prevpos.y}`]
+        var prevpos = this.pos.c().add(convertDirection(this.direction).c().scale(-1))
+        return this.getBelt(prevpos)
+    }
+
+    getBelt(pos:Vector):Belt{
+        var entity = entitygrid[`${pos.x}:${pos.y}`]
+        if(entity?.type == 'belt'){
+            return entity as Belt
+        }
+        return null
     }
 
     getSideLoadingBelts():Belt[]{
@@ -107,8 +116,8 @@ class Belt extends Entity{
 
         var leftpos = this.pos.c().add(dir.c().rotate2d(0.25))
         var rightpos = this.pos.c().add(dir.c().rotate2d(-0.25))
-        sidebelts.push(beltgrid[`${leftpos.x}:${leftpos.y}`]) 
-        sidebelts.push(beltgrid[`${rightpos.x}:${rightpos.y}`]) 
+        sidebelts.push(this.getBelt(leftpos)) 
+        sidebelts.push(this.getBelt(rightpos)) 
 
         sidebelts = sidebelts.filter(sb => sb != null)
         return sidebelts
@@ -142,6 +151,24 @@ class Belt extends Entity{
     }
 }
 
+function drawImage(img:HTMLImageElement, pos:Vector, size:Vector,angle:number = 0){
+    if(!img){
+        drawRect(pos,size)
+        return
+    }
+
+    if(!angle){
+        ctxt.drawImage(img, pos.x, pos.y, size.x, size.y)
+        return
+    }
+
+    ctxt.save()
+    ctxt.translate(pos.x + size.x/2, pos.y + size.y/2)
+    ctxt.rotate(angle)
+    ctxt.drawImage(img, -size.x/2, -size.y/2, size.x, size.y)
+    ctxt.restore()
+}
+
 class itemMoveCompletion{
     item:Item
     completion:number
@@ -150,3 +177,11 @@ class itemMoveCompletion{
         Object.assign(this,data)
     }
 }
+
+function rotateVec90(vec:Vector,clockwise:boolean = true):Vector{
+    if(clockwise){
+        return new Vector(vec.y,-vec.x)
+    } else {
+        return new Vector(-vec.y,vec.x)
+    }
+}   

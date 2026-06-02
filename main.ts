@@ -42,13 +42,18 @@ const ctxt = crret.ctxt
 var gridsize = new Vector(50,50)
 var halfgridsize = gridsize.c().scale(0.5)
 var arrowImage:HTMLImageElement
+var handimage:HTMLImageElement
+var machineImage:HTMLImageElement
+
 var camera = new Camera(ctxt)
 var player = new Player({
     pos:new Vector(10,10)
 })
 
-loadImages(['/images/arrow.png']).then(images => {
+loadImages(['/images/arrow.png', '/images/hand.png', '/images/machine.png']).then(images => {
     arrowImage = images[0]
+    handimage = images[1]
+    machineImage = images[2]
 })
 
 var starterbelt = new Belt({
@@ -78,15 +83,45 @@ var entities = [
         pos:new Vector(14,10),
         direction:Direction.down,
     }),
+    new Inserter({
+        pos:new Vector(12,11),
+        direction:Direction.down,
+        speed:0.5,
+    }),
+    new Belt({
+        pos:new Vector(12,12),
+        direction:Direction.left,
+    }),
+    new Machine({
+        pos:new Vector(11,12),
+        footprint:[
+            [1,0,1],
+            [1,1,1],
+            [1,0,1]
+        ],
+        inputslots:[],
+        outputslots:[],
+        availableRecipes:[
+            new Recipe({
+                name:"iron gear",
+                inputs:[
+                    {name:"iron plate", amount:1},
+                ],
+                outputs:[
+                    {name:"iron gear", amount:1},
+                ],
+                craftingTime:1,
+            })
+        ],
+        workingspeed:1,
+    }),
     ironplate,
     player,
 ]
 
-var beltgrid = {}
+var entitygrid = {}
 for(var entity of entities){
-    if(entity.type == 'belt'){
-        beltgrid[`${entity.pos.x}:${entity.pos.y}`] = entity
-    }
+    entitygrid[`${entity.pos.x}:${entity.pos.y}`] = entity
 }
 
 var time = 0
@@ -124,3 +159,29 @@ document.addEventListener('keydown',(e) => {
         }
     }
 })
+
+function save2file(filename:string){
+    var data = JSON.stringify(entities)
+    var blob = new Blob([data], {type: 'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function loadFromFile(callback:(data:string) => void){
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = e => {
+        var file = (e.target as HTMLInputElement).files[0];
+        var reader = new FileReader();
+        reader.readAsText(file,'UTF-8');
+        reader.onload = readerEvent => {
+            var content = readerEvent.target.result as string;
+            callback(content)
+        }
+    }
+    input.click();
+}

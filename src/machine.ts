@@ -1,6 +1,6 @@
 class Machine extends Entity{
 
-    footprint
+    footprint:number[][]
     inputslots:Item[]
     outputslots:Item[]
     availableRecipes:Recipe[]
@@ -16,7 +16,7 @@ class Machine extends Entity{
     }
 
     isReadyToAcceptItem():boolean{
-        
+        return false
     }
 
     acceptItem(item:Item){

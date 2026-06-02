@@ -17,6 +17,7 @@ class Inserter extends Entity{
 
     acceptItem(item:Item){
         this.holdingslot = item
+        this.progression = 0
     }
 
     isReadyToGiveItem(){
@@ -32,12 +33,12 @@ class Inserter extends Entity{
     
 
     update(dt){
-        var src = convertDirection(this.direction)
-        var dst = src.c().scale(-1)
+        var dst = convertDirection(this.direction)
+        var src = dst.c().scale(-1)
         var srcbelt = getBelt(this.pos.c().add(src));
         var dstbelt = getBelt(this.pos.c().add(dst));//should be possible to be a machine aswell
-        if(this.isReadyToAcceptItem() && srcbelt.isReadyToGiveItem()){
-            this.acceptItem(srcbelt.giveItem())
+        if(this.isReadyToAcceptItem() && srcbelt.itemqueue.length > 0){
+            this.acceptItem(srcbelt.giveItemFirst())
         }
 
         if(this.holdingslot != null){
@@ -45,15 +46,14 @@ class Inserter extends Entity{
             this.holdingslot.pos = srcbelt.pos.lerp(dstbelt.pos,this.progression)
         }
 
-        if(dstbelt.isReadyToAcceptItem() && this.isReadyToGiveItem()){
+        if(dstbelt?.isReadyToAcceptItem() && this.isReadyToGiveItem()){
             dstbelt.acceptItem(this.giveItem())
         }
-        
-
     }
 
     draw(){
         ctxt.fillStyle = "red"
-        drawRectCentered(world2abs(this.pos),new Vector(20,20))
+        drawRect(world2abs(this.pos),gridsize)
+        drawImage(handimage,world2abs(this.pos),gridsize)
     }
 }
