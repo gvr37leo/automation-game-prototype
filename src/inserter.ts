@@ -8,6 +8,7 @@ class Inserter extends Entity{
 
     constructor(data){
         super()
+        this.type = 'inserter'
         Object.assign(this,data)
     }
 
@@ -54,6 +55,6 @@ class Inserter extends Entity{
     draw(){
         ctxt.fillStyle = "red"
         drawRect(world2abs(this.pos),gridsize)
-        drawImage(handimage,world2abs(this.pos),gridsize)
+        drawImage('hand.png',world2abs(this.pos),gridsize)
     }
 }

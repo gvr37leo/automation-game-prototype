@@ -99,16 +99,10 @@ class Belt extends Entity{
         
 
         var prevpos = this.pos.c().add(convertDirection(this.direction).c().scale(-1))
-        return this.getBelt(prevpos)
+        return getBelt(prevpos)
     }
 
-    getBelt(pos:Vector):Belt{
-        var entity = entitygrid[`${pos.x}:${pos.y}`]
-        if(entity?.type == 'belt'){
-            return entity as Belt
-        }
-        return null
-    }
+
 
     getSideLoadingBelts():Belt[]{
         var sidebelts = []
@@ -116,18 +110,14 @@ class Belt extends Entity{
 
         var leftpos = this.pos.c().add(dir.c().rotate2d(0.25))
         var rightpos = this.pos.c().add(dir.c().rotate2d(-0.25))
-        sidebelts.push(this.getBelt(leftpos)) 
-        sidebelts.push(this.getBelt(rightpos)) 
+        sidebelts.push(getBelt(leftpos)) 
+        sidebelts.push(getBelt(rightpos)) 
 
         sidebelts = sidebelts.filter(sb => sb != null)
         return sidebelts
     }
 
     draw(){
-        var abspos = this.pos.c().mul(gridsize)
-        var center = abspos.c().add(halfgridsize)
-        
-        // Calculate rotation angle based on direction
         var rotationAngles = {}
         rotationAngles[Direction.up] = 0
         rotationAngles[Direction.right] = Math.PI / 2
@@ -135,32 +125,18 @@ class Belt extends Entity{
         rotationAngles[Direction.left] = 3 * Math.PI / 2
         
         var angle = rotationAngles[this.direction] || 0
-        
-        // Draw rotated arrow
-        if(arrowImage){
-            ctxt.save()
-            ctxt.translate(center.x, center.y)
-            ctxt.rotate(angle)
-            ctxt.drawImage(arrowImage, -gridsize.x/2, -gridsize.y/2, gridsize.x, gridsize.y)
-            ctxt.restore()
-        } else {
-            // Fallback to white rectangle if image not loaded
-            ctxt.fillStyle = 'white'
-            drawRect(abspos,gridsize)
-        }
+        drawImage('arrow.png',world2abs(this.pos),gridsize,angle)
     }
 }
 
-function drawImage(img:HTMLImageElement, pos:Vector, size:Vector,angle:number = 0){
+function drawImage(imgstr:string, pos:Vector, size:Vector,angle:number = 0){
+    var img = imageMap.get(imgstr)
     if(!img){
+        ctxt.fillStyle = "magenta"
         drawRect(pos,size)
         return
     }
 
-    if(!angle){
-        ctxt.drawImage(img, pos.x, pos.y, size.x, size.y)
-        return
-    }
 
     ctxt.save()
     ctxt.translate(pos.x + size.x/2, pos.y + size.y/2)

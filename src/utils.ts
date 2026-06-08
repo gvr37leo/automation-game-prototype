@@ -28,5 +28,9 @@ function world2abs(pos){
 }
 
 function getBelt(pos:Vector):Belt{
-    return beltgrid[`${pos.x}:${pos.y}`]
+    var entity = entitygrid[`${pos.x}:${pos.y}`]
+    if(entity?.type == 'belt'){
+        return entity as Belt
+    }
+    return null
 }

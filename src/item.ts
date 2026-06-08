@@ -1,11 +1,13 @@
 class Item extends Entity{
 
     name:string
+    amount:number
     stackSize:number
     maxStackSize:number
 
     constructor(data){
         super()
+        this.type = 'item'
         Object.assign(this,data)
     }
 

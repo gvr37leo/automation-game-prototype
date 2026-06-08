@@ -41,20 +41,43 @@ var canvas = crret.canvas
 const ctxt = crret.ctxt
 var gridsize = new Vector(50,50)
 var halfgridsize = gridsize.c().scale(0.5)
-var arrowImage:HTMLImageElement
-var handimage:HTMLImageElement
-var machineImage:HTMLImageElement
+// var arrowImage:HTMLImageElement
+// var handimage:HTMLImageElement
+// var machineImage:HTMLImageElement
+var imageMap = new Map<string, HTMLImageElement>()
 
 var camera = new Camera(ctxt)
 var player = new Player({
     pos:new Vector(10,10)
 })
 
-loadImages(['/images/arrow.png', '/images/hand.png', '/images/machine.png']).then(images => {
-    arrowImage = images[0]
-    handimage = images[1]
-    machineImage = images[2]
-})
+function loadAvailableImages(){
+    return fetch('/images/list')
+    .then(resp => resp.json())
+    .then(function(fileNames){
+        if(!Array.isArray(fileNames)){
+            throw new Error('Invalid image list from server')
+        }
+
+        var urls = fileNames.map(function(name){
+            return '/images/' + name
+        })
+
+        return loadImages(urls).then(function(images){
+            for(var i = 0; i < fileNames.length; i++){
+                imageMap.set(fileNames[i], images[i])
+            }
+            // arrowImage = imageMap.get('arrow.png')
+            // handimage = imageMap.get('hand.png')
+            // machineImage = imageMap.get('machine.png')
+        })
+    })
+    .catch(function(err){
+        console.error('Failed to load image list:', err)
+    })
+}
+
+loadAvailableImages()
 
 var starterbelt = new Belt({
     pos:new Vector(11,9),

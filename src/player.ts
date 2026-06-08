@@ -4,6 +4,7 @@ class Player extends Entity{
 
     constructor(data){
         super()
+        this.type = 'player'
         Object.assign(this,data)
     }
 
